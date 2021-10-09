@@ -21,3 +21,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 include(CTest)
 enable_testing()
+
+#include(GoogleTest)
+#gtest_discover_tests()

@@ -7,28 +7,21 @@
 // Each state must be attached to only one function
 
 #pragma once
+#include <functional>
 
-#include <map>
-#include <memory>
 
-class IFSM
-{
-};
-
-typedef void (*StateHandler)();
-
-template <class T>
+template <class State, class Event>
 struct State_t
 {
-    T state;
-    StateHandler handler;
+    State state;
+    std::function<Event()> handler;
 };
 
 template <class State, class Event>
-struct TransitionTable_t
+struct Transition_t
 {
-    State_t<State> currentState;
-    State_t<State> nextState;
+    State_t<State, Event> currentState;
+    State_t<State, Event> nextState;
     Event event;
 };
 
@@ -36,15 +29,15 @@ template <class State, class Event>
 class FSM
 {
 public:
-    FSM(TransitionTable_t<State, Event> transitions_, bool continousRun_ = false);
+    FSM(std::vector<Transition_t<State, Event>> transitionsTable_, bool continousRun_ = false);
     virtual ~FSM() = default;
 
     State GetState();
     void Run();
 
 private:
-    TransitionTable_t<State, Event> transitions;
-    State_t<State> currentState;
+    std::vector<Transition_t<State, Event>> transitionsTable;
+    State_t<State, Event> currentState;
     bool continousRun;
 };
 
