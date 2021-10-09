@@ -9,10 +9,15 @@ set(COMPILE_OPTIONS
 )
 
 
-
-add_executable(${PROJECT_NAME} main.cpp)
+add_executable(${PROJECT_NAME} src/main.cpp)
 
 target_compile_options(${PROJECT_NAME} PUBLIC ${COMPILE_OPTIONS})
+
+target_include_directories(${PROJECT_NAME} PUBLIC
+
+  ${CMAKE_CURRENT_SOURCE_DIR}
+
+)
 
 include(CTest)
 enable_testing()
