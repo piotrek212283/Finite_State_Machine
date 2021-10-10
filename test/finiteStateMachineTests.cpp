@@ -55,11 +55,11 @@ public:
             {State::S4, std::bind(&MockIHandlers::s4_handler, &handlers)}};
 
         transitionTable = {
-            {State::S1, Event::Transition_To_S2, State::S2},
-            {State::S1, Event::Transition_To_S1, State::S1},
-            {State::S2, Event::Transition_To_S3, State::S3},
-            {State::S3, Event::Transition_To_S4, State::S4},
-            {State::S4, Event::Transition_To_S1, State::S1}};
+            {{State::S1, Event::Transition_To_S2}, State::S2},
+            {{State::S1, Event::Transition_To_S1}, State::S1},
+            {{State::S2, Event::Transition_To_S3}, State::S3},
+            {{State::S3, Event::Transition_To_S4}, State::S4},
+            {{State::S4, Event::Transition_To_S1}, State::S1}};
     }
 
     void SetUp()
@@ -70,7 +70,7 @@ public:
 public:
     MockIHandlers handlers;
     std::shared_ptr<FSM<State, Event>> finiteStateMachine;
-    std::vector<Transition_t<State, Event>> transitionTable;
+    std::map<std::pair<State, Event>, State> transitionTable;
     std::map<State, std::function<Event()>> statesHandlers;
 };
 
@@ -104,3 +104,13 @@ TEST_F(FSM_Tests, FSM_Shoud_Handle_Multiple_Events_Attached_To_One_State)
     EXPECT_EQ(firstState, State::S1);
     EXPECT_EQ(secondState, State::S2);
 }
+
+
+TEST_F(FSM_Tests, FSM_Shoud_Validate_If_States_Have_Connected_Handler_Function)
+{
+
+    statesHandlers[State::S1] = nullptr;
+
+    finiteStateMachine->run();
+}
+

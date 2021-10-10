@@ -12,21 +12,13 @@
 #include <map>
 
 template <class State, class Event>
-struct Transition_t
-{
-    State currentState;
-    Event event;
-    State nextState;
-};
-
-template <class State, class Event>
 class FSM
 {
-    using TransitionsVector = std::vector<Transition_t<State, Event>>;
+    using TransitionsMap = std::map<std::pair<State, Event>, State>;
     using StatesHandlersMap = std::map<State, std::function<Event()>>;
 
 public:
-    FSM(const TransitionsVector transitionsTable_, const StatesHandlersMap statesHandlers_, bool continousRun_ = false);
+    FSM(const TransitionsMap transitions_, const StatesHandlersMap statesHandlers_, bool continousRun_ = false);
     virtual ~FSM() = default;
 
     State getState();
@@ -37,14 +29,17 @@ private:
     Event executeStateHandler();
 
 private:
-    TransitionsVector transitionsTable;
+    TransitionsMap transitions;
     StatesHandlersMap statesHandlers;
     bool continousRun;
     State currentState;
 };
 
 template <class State, class Event>
-FSM<State, Event>::FSM(const TransitionsVector transitionsTable_, const StatesHandlersMap statesHandlers_, bool continousRun_) : transitionsTable(transitionsTable_), statesHandlers(statesHandlers_), continousRun(continousRun_)
+FSM<State, Event>::FSM(const TransitionsMap transitions_, const StatesHandlersMap statesHandlers_, bool continousRun_)
+    : transitions(transitions_)
+    , statesHandlers(statesHandlers_)
+    , continousRun(continousRun_)
 {
     currentState = State();
 }
@@ -58,16 +53,11 @@ State FSM<State, Event>::getState()
 template <class State, class Event>
 State FSM<State, Event>::processStateTransition(Event event)
 {
-    for (auto &transition : transitionsTable)
-    {
-        if (transition.event == event)
-        {
-            if (transition.currentState == currentState)
-            {
-                return transition.nextState;
-            }
-        }
+    auto it = transitions.find(std::make_pair(currentState, event));
+    if (it != transitions.end()) {
+        return it->second;
     }
+
     return currentState;
 }
 
