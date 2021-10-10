@@ -4,7 +4,8 @@ set(CMAKE_BUILD_TYPE Debug)
 
 set(COMPILE_OPTIONS
   -std=c++17
-  -Og
+  -O0
+  -g
   -fdiagnostics-color=always
 )
 
@@ -20,6 +21,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 ## Testing
 include(CTest)
 enable_testing()
+include(GoogleTest)
 
 add_subdirectory(googletest)
 
@@ -39,4 +41,4 @@ target_link_libraries(${PROJECT_NAME}_tests PUBLIC
   gmock
 )
 
-add_test(${PROJECT_NAME}_tests ${PROJECT_NAME}_tests)
+gtest_discover_tests(${PROJECT_NAME}_tests)
