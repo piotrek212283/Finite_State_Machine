@@ -8,8 +8,8 @@
 
 #pragma once
 #include <functional>
-#include <map>
 #include <iostream>
+#include <map>
 
 template <class State, class Event>
 struct Transition_t
@@ -22,50 +22,68 @@ struct Transition_t
 template <class State, class Event>
 class FSM
 {
+    using TransitionsVector = std::vector<Transition_t<State, Event>>;
+    using StatesHandlersMap = std::map<State, std::function<Event()>>;
+
 public:
-    FSM(const std::vector<Transition_t<State, Event>> transitionsTable_, const std::map<State, std::function<Event()>> stateHandlers_, bool continousRun_ = false);
+    FSM(const TransitionsVector transitionsTable_, const StatesHandlersMap statesHandlers_, bool continousRun_ = false);
     virtual ~FSM() = default;
 
-    State GetState();
-    void Run();
+    State getState();
+    void run();
 
 private:
-    std::vector<Transition_t<State, Event>> transitionsTable;
-    std::map<State, std::function<Event()>> stateHandlers;
-    State currentState;
+    State processStateTransition(Event event);
+    Event executeStateHandler();
+
+private:
+    TransitionsVector transitionsTable;
+    StatesHandlersMap statesHandlers;
     bool continousRun;
+    State currentState;
 };
 
 template <class State, class Event>
-FSM<State, Event>::FSM(const std::vector<Transition_t<State, Event>> transitionsTable_, const std::map<State, std::function<Event()>> stateHandlers_, bool continousRun_) : transitionsTable(transitionsTable_), stateHandlers(stateHandlers_), continousRun(continousRun_)
+FSM<State, Event>::FSM(const TransitionsVector transitionsTable_, const StatesHandlersMap statesHandlers_, bool continousRun_) : transitionsTable(transitionsTable_), statesHandlers(statesHandlers_), continousRun(continousRun_)
 {
-    currentState = transitionsTable.at(0).currentState;
+    currentState = State();
 }
 
 template <class State, class Event>
-State FSM<State, Event>::GetState()
+State FSM<State, Event>::getState()
 {
     return currentState;
 }
 
 template <class State, class Event>
-void FSM<State, Event>::Run()
+State FSM<State, Event>::processStateTransition(Event event)
+{
+    for (auto &transition : transitionsTable)
+    {
+        if (transition.event == event)
+        {
+            if (transition.currentState == currentState)
+            {
+                return transition.nextState;
+            }
+        }
+    }
+    return currentState;
+}
+
+template <class State, class Event>
+Event FSM<State, Event>::executeStateHandler()
+{
+    return statesHandlers[currentState]();
+}
+
+template <class State, class Event>
+void FSM<State, Event>::run()
 {
     do
     {
-        Event newEvent = stateHandlers[currentState]();
-
-        //Search through vector table
-        for (auto &transition : transitionsTable)
-        {
-            if (transition.event == newEvent) {
-                if (transition.currentState == currentState)
-                {
-                    currentState = transition.nextState;
-                }
-            }
-        }
+        Event newEvent = executeStateHandler();
+        currentState = processStateTransition(newEvent);
 
     } while (continousRun);
-    
 }
