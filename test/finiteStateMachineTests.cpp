@@ -106,11 +106,4 @@ TEST_F(FSM_Tests, FSM_Shoud_Handle_Multiple_Events_Attached_To_One_State)
 }
 
 
-TEST_F(FSM_Tests, FSM_Shoud_Validate_If_States_Have_Connected_Handler_Function)
-{
-
-    statesHandlers[State::S1] = nullptr;
-
-    finiteStateMachine->run();
-}
 

@@ -1,11 +1,3 @@
-//Requirements
-// Explicit transition table
-// States could have multiple events
-// States could have multiple routes to another states
-// Event search should be optimized
-// States business logic should be implemented as function pointers
-// Each state must be attached to only one function
-
 #pragma once
 #include <functional>
 #include <iostream>
